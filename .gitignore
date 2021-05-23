@@ -41,4 +41,6 @@ hs_err_pid*
 
 jacoco.exec
 bin/
+.idea/
+
 gradle.properties
