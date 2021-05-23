@@ -1,0 +1,57 @@
+plugins {
+    id "com.gradle.plugin-publish" version "0.10.1"
+    id "java-gradle-plugin"
+    id "nu.studer.credentials" version "2.1"
+}
+
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'com.gradle.plugin-publish'
+apply plugin: 'maven-publish'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.12'
+}
+
+gradlePlugin {
+    plugins {
+        "${project.pluginDisplayName}" {
+            id = 'andxu.greeting'
+            implementationClass = 'andxu.greeting.GreetingPlugin'
+        }
+    }
+}
+group = 'gradle.plugin.andxu.greeting'
+pluginBundle {
+  website = 'https://github.com/andxu/gradle-hello-plugin'
+  vcsUrl = 'https://github.com/andxu/gradle-hello-plugin'
+
+  plugins {
+    "${project.pluginDisplayName}" {
+        id = 'andxu.greeting'
+        displayName = 'Gradle Greeting plugin(andxu)'
+        description = 'Greeting Plugin for gradle'
+        tags = ['greeting']
+    }
+  }
+}
+
+task setupPluginUpload {
+    doLast {
+        def key = credentials['gradle.publish.key']
+        def secret = credentials['gradle.publish.secret']
+        if( !key || !secret) {
+            throw new RuntimeException("gradlePublishKey and/or gradlePublishSecret are not defined")
+        }
+
+        System.properties.setProperty("gradle.publish.key", key)
+        System.properties.setProperty("gradle.publish.secret", secret)
+    }
+}
+
+tasks.publishPlugins.dependsOn tasks.setupPluginUpload
